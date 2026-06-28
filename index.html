@@ -97,6 +97,18 @@
       letter-spacing: 0.05em;
     }
 
+    @media (max-width: 480px) {
+      .line-row {
+        grid-template-columns: 1fr auto auto 34px;
+        grid-template-rows: auto auto;
+        row-gap: 6px;
+      }
+      .line-row .cell:first-child {
+        grid-column: 1 / -1;
+      }
+      .line-row.header { display: none; }
+    }
+
     .cell { display: flex; flex-direction: column; align-items: stretch; gap: 2px; }
     .hint { font-size: 11px; color: var(--text-muted); height: 16px; display: flex; align-items: center; }
     .qty-limit.over { color: var(--danger-text); }
@@ -278,10 +290,10 @@
 <body>
 
 <main class="card" role="main">
-  <h1 class="card-title">Catte’s Auction Calculator</h1>
+  <h1 class="card-title">The Catteculator</h1>
 
   <div class="line-row header" aria-hidden="true">
-    <span>Item/Coin</span>
+    <span>Item</span>
     <span style="text-align:right">Amount</span>
     <span style="text-align:right">Value</span>
     <span></span>
@@ -301,13 +313,13 @@
   <div class="summary" aria-live="polite">
     <div>
       <div class="summary-label">Total Bid Value</div>
-      <div class="summary-value" id="grand-total">0.00</div>
+      <div class="summary-value" id="grand-total">0</div>
     </div>
   </div>
 
   <div class="output-section">
     <div class="output-header">
-      <span class="output-label">Bid</span>
+      <span class="output-label">Formatted Bid</span>
       <button class="copy-btn" id="copy-btn" onclick="copyResult()">
         <i class="ti ti-copy" aria-hidden="true"></i> Copy Bid
       </button>
@@ -322,7 +334,8 @@
   // ── Edit this array to update your item list ────────────────────────────────
   // maxQty: maximum quantity allowed per line (set to null for no limit)
   const catalogItems = [
-    { name: 'Coin', price: 1, maxQty: null },{ name: 'Super Modifier Potion', price: 15000, maxQty: null },
+    { name: 'Coin', price: 1, maxQty: null },
+    { name: 'Super Modifier Potion', price: 15000, maxQty: null },
     { name: 'Super Marking Potion', price: 15000, maxQty: null },
     { name: 'Variant Potion', price: 15000, maxQty: null },
     { name: 'Anomalous Wand', price: 15000, maxQty: null },
@@ -381,7 +394,7 @@
     { name: 'Botched Servant', price: 30000, maxQty: null },
     { name: 'Strange Shadow', price: 30000, maxQty: null },
     { name: 'Gelatinous Cube', price: 30000, maxQty: null },
-  ] ;
+  ];
   // ───────────────────────────────────────────────────────────────────────────
 
   let lines = [];
@@ -433,7 +446,7 @@
     list.innerHTML = lines.map((line, i) => {
       const item = catalogItems[line.itemIndex];
       const qty = parseInt(line.qty) || 0;
-      const total = item ? (item.price * qty).toFixed(2) : '0.00';
+      const total = item ? (item.price * qty).toFixed(0) : '0';
       const itemMax = item && item.maxQty != null ? item.maxQty : null;
 
       return `<div class="line-row" role="listitem">
@@ -476,7 +489,7 @@
       const lineTotal = item ? item.price * qty : 0;
       grand += lineTotal;
       const span = document.querySelectorAll('.row-total')[i];
-      if (span) span.textContent = lineTotal.toFixed(0);
+      if (span) span.textContent = lineTotal.toFixed(0) + ' 🟡';
       const limitEl = document.querySelectorAll('.qty-limit')[i];
       if (limitEl && item && item.maxQty != null) {
         limitEl.classList.toggle('over', qty > item.maxQty);
@@ -486,7 +499,7 @@
       }
     });
 
-    document.getElementById('grand-total').textContent = grand.toFixed(0);
+    document.getElementById('grand-total').textContent = grand.toFixed(0) + ' 🟡';
 
     const outputBox = document.getElementById('output-box');
     if (resultLines.length) {
