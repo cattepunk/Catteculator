@@ -476,21 +476,21 @@
       const lineTotal = item ? item.price * qty : 0;
       grand += lineTotal;
       const span = document.querySelectorAll('.row-total')[i];
-      if (span) span.textContent = lineTotal.toFixed(2);
+      if (span) span.textContent = lineTotal.toFixed(0);
       const limitEl = document.querySelectorAll('.qty-limit')[i];
       if (limitEl && item && item.maxQty != null) {
         limitEl.classList.toggle('over', qty > item.maxQty);
       }
       if (item && qty > 0) {
-        resultLines.push(`${item.name} x${qty} = ${lineTotal.toFixed(2)}`);
+        resultLines.push(`${item.name} x${qty} = ${lineTotal.toFixed(0)}`);
       }
     });
 
-    document.getElementById('grand-total').textContent = grand.toFixed(2);
+    document.getElementById('grand-total').textContent = grand.toFixed(0);
 
     const outputBox = document.getElementById('output-box');
     if (resultLines.length) {
-      outputBox.value = '## Total: ' + grand.toFixed(2) + '\n-# ' + resultLines.join(', ');
+      outputBox.value = '## Total: ' + grand.toFixed(0) + '\n-# ' + resultLines.join(', ');
     } else {
       outputBox.value = '';
     }
