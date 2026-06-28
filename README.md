@@ -1,2 +1,2 @@
-# Catteculator
-Catte's DC Auction Calculator
+title: Catteculator
+description: Catte's DC Auction Calculator
