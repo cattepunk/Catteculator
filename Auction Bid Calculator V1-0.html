@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Item Calculator</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:            #f5f5f4;
+      --surface:       #ffffff;
+      --border:        #e2e2e0;
+      --border-strong: #c9c9c6;
+      --text-primary:  #1c1c1a;
+      --text-secondary:#6b6b68;
+      --text-muted:    #a1a19e;
+      --accent-bg:     #eff6ff;
+      --accent-border: #bfdbfe;
+      --danger-bg:     #fef2f2;
+      --danger-text:   #b91c1c;
+      --danger-border: #fecaca;
+      --success-bg:    #f0fdf4;
+      --success-text:  #15803d;
+      --success-border:#bbf7d0;
+      --radius:        8px;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:            #1a1a18;
+        --surface:       #242422;
+        --border:        #333330;
+        --border-strong: #4a4a46;
+        --text-primary:  #f0f0ee;
+        --text-secondary:#a0a09c;
+        --text-muted:    #6a6a66;
+        --accent-bg:     #1e2a3a;
+        --accent-border: #2a4a6a;
+        --danger-bg:     #2a1a1a;
+        --danger-text:   #f87171;
+        --danger-border: #5a2a2a;
+        --success-bg:    #1a2a1e;
+        --success-text:  #4ade80;
+        --success-border:#2a4a30;
+      }
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      width: 100%;
+      max-width: 640px;
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+    }
+
+    .line-row {
+      display: grid;
+      grid-template-columns: 1fr 110px 110px 34px;
+      gap: 10px;
+      align-items: start;
+      padding: 8px 0;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .line-row.header {
+      padding-bottom: 6px;
+      border-bottom: 0.5px solid var(--border-strong);
+    }
+
+    .line-row.header span {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .cell { display: flex; flex-direction: column; align-items: stretch; gap: 2px; }
+    .hint { font-size: 11px; color: var(--text-muted); height: 16px; display: flex; align-items: center; }
+    .qty-limit.over { color: var(--danger-text); }
+
+    .custom-select { position: relative; width: 100%; }
+    .custom-select select {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; z-index: 1;
+    }
+    .custom-select-display {
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 7px 28px 7px 10px;
+      font-size: 14px;
+      background: var(--surface);
+      color: var(--text-primary);
+      width: 100%;
+      font-family: var(--font);
+      white-space: normal;
+      word-break: break-word;
+      line-height: 1.4;
+      min-height: 36px;
+      box-sizing: border-box;
+      position: relative;
+    }
+    .custom-select-display::after {
+      content: '';
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0; height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid var(--text-muted);
+      pointer-events: none;
+    }
+    .custom-select:focus-within .custom-select-display {
+      border-color: var(--accent-border);
+      box-shadow: 0 0 0 3px var(--accent-bg);
+    }
+
+    input[type="number"] {
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 7px 10px;
+      font-size: 14px;
+      background: var(--surface);
+      color: var(--text-primary);
+      outline: none;
+      width: 100%;
+      font-family: var(--font);
+      appearance: auto;
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--accent-border);
+      box-shadow: 0 0 0 3px var(--accent-bg);
+    }
+
+    input[type="number"] { text-align: right; }
+
+    .row-total {
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .del-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px;
+      border-radius: var(--radius);
+      transition: background 0.1s, color 0.1s;
+    }
+
+    .del-btn:hover { background: var(--danger-bg); color: var(--danger-text); }
+
+    .bottom-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 1rem;
+    }
+
+    .btn {
+      background: none;
+      border: 0.5px solid var(--border-strong);
+      border-radius: var(--radius);
+      padding: 8px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: var(--font);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.1s, color 0.1s;
+    }
+
+    .btn:hover { background: var(--bg); color: var(--text-primary); }
+
+    .btn.reset { margin-left: auto; }
+    .btn.reset:hover { background: var(--danger-bg); color: var(--danger-text); border-color: var(--danger-border); }
+
+    .summary {
+      margin-top: 1.25rem;
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .summary-label { font-size: 12px; color: var(--text-muted); margin-bottom: 2px; }
+    .summary-value { font-size: 22px; font-weight: 500; font-variant-numeric: tabular-nums; }
+    .summary-meta { font-size: 13px; color: var(--text-secondary); }
+
+    .output-section { margin-top: 1.25rem; }
+
+    .output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .output-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .copy-btn {
+      background: none;
+      border: 0.5px solid var(--border-strong);
+      border-radius: var(--radius);
+      padding: 4px 10px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-family: var(--font);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.1s, color 0.1s, border-color 0.1s;
+    }
+
+    .copy-btn:hover { background: var(--bg); color: var(--text-primary); }
+
+    .copy-btn.copied {
+      color: var(--success-text);
+      border-color: var(--success-border);
+      background: var(--success-bg);
+    }
+
+    textarea.output-box {
+      width: 100%;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      font-size: 13px;
+      font-family: var(--font-mono);
+      background: var(--bg);
+      color: var(--text-primary);
+      resize: none;
+      outline: none;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+
+<main class="card" role="main">
+  <h1 class="card-title">Catte’s Auction Calculator</h1>
+
+  <div class="line-row header" aria-hidden="true">
+    <span>Item/Coin</span>
+    <span style="text-align:right">Amount</span>
+    <span style="text-align:right">Value</span>
+    <span></span>
+  </div>
+
+  <div id="lines-list" role="list" aria-label="Order lines"></div>
+
+  <div class="bottom-row">
+    <button class="btn" onclick="addLine()">
+      <i class="ti ti-plus" aria-hidden="true"></i> Add
+    </button>
+    <button class="btn reset" onclick="resetAll()">
+      <i class="ti ti-refresh" aria-hidden="true"></i> Reset
+    </button>
+  </div>
+
+  <div class="summary" aria-live="polite">
+    <div>
+      <div class="summary-label">Total Bid Value</div>
+      <div class="summary-value" id="grand-total">0.00</div>
+    </div>
+  </div>
+
+  <div class="output-section">
+    <div class="output-header">
+      <span class="output-label">Bid</span>
+      <button class="copy-btn" id="copy-btn" onclick="copyResult()">
+        <i class="ti ti-copy" aria-hidden="true"></i> Copy Bid
+      </button>
+    </div>
+    <textarea class="output-box" id="output-box" rows="6" readonly
+      placeholder="Your bid summary will appear here…"
+      aria-label="Bid summary for copying"></textarea>
+  </div>
+</main>
+
+<script>
+  // ── Edit this array to update your item list ────────────────────────────────
+  // maxQty: maximum quantity allowed per line (set to null for no limit)
+  const catalogItems = [
+    { name: 'Coin', price: 1, maxQty: null },{ name: 'Super Modifier Potion', price: 15000, maxQty: null },
+    { name: 'Super Marking Potion', price: 15000, maxQty: null },
+    { name: 'Variant Potion', price: 15000, maxQty: null },
+    { name: 'Anomalous Wand', price: 15000, maxQty: null },
+    { name: 'Rainbow Slime', price: 30000, maxQty: null },
+    { name: 'Prism Wand', price: 30000, maxQty: null },
+    { name: 'Starfield Wand', price: 30000, maxQty: null },
+    { name: 'Wizards Pendant', price: 40000, maxQty: null },
+    { name: 'High Gemstone', price: 40000, maxQty: null },
+    { name: 'Fay Gemstone', price: 40000, maxQty: null },
+    { name: 'Harvesters Pitchfork', price: 40000, maxQty: null },
+    { name: 'Sooty Band', price: 1000, maxQty: 10 },
+    { name: 'Dun Band', price: 1000, maxQty: 10 },
+    { name: 'Pangare Band', price: 1000, maxQty: 10 },
+    { name: 'Gray Band', price: 1000, maxQty: 10 },
+    { name: 'Flaxen Band', price: 5000, maxQty: 10 },
+    { name: 'Silver Band', price: 5000, maxQty: 10 },
+    { name: 'Illuminated Wand', price: 5000, maxQty: 10 },
+    { name: 'Cuirass Charm', price: 5000, maxQty: 10 },
+    { name: 'Leopard Charm', price: 5000, maxQty: 10 },
+    { name: 'Crowned Charm', price: 5000, maxQty: 10 },
+    { name: 'White Pendant', price: 5000, maxQty: 10 },
+    { name: 'Stained Glass Shards', price: 5000, maxQty: 10 },
+    { name: 'Fragmented Geode', price: 5000, maxQty: 10 },
+    { name: 'Glittering Swarf', price: 5000, maxQty: 10 },
+    { name: 'Sepulchered Wand', price: 5000, maxQty: 10 },
+    { name: 'Collar Charm', price: 5000, maxQty: 10 },
+    { name: 'Girdle Charm', price: 5000, maxQty: 10 },
+    { name: 'False Leopard Charm', price: 10000, maxQty: 10 },
+    { name: 'Tapestry Wand', price: 10000, maxQty: 10 },
+    { name: 'Tabard Wand', price: 10000, maxQty: 10 },
+    { name: 'Gilt Wand', price: 10000, maxQty: 10 },
+    { name: 'Blanched Charm', price: 10000, maxQty: 10 },
+    { name: 'Furled Pennant', price: 10000, maxQty: 10 },
+    { name: 'Signet Ring', price: 10000, maxQty: 10 },
+    { name: 'Vellum Wand', price: 10000, maxQty: 10 },
+    { name: 'Glowing Lantern', price: 10000, maxQty: 10 },
+    { name: 'Harlequin Charm', price: 15000, maxQty: 10 },
+    { name: 'Opal Wand', price: 15000, maxQty: 10 },
+    { name: 'Shroud Charm', price: 15000, maxQty: 10 },
+    { name: 'Fewspot Charm', price: 15000, maxQty: 10 },
+    { name: 'Lacquer Wand', price: 15000, maxQty: 10 },
+    { name: 'Filigree Charm', price: 20000, maxQty: 10 },
+    { name: 'Ossuary Charm', price: 20000, maxQty: 10 },
+    { name: 'Vault Key', price: 1000, maxQty: null },
+    { name: 'Scroll Pack', price: 5000, maxQty: null },
+    { name: 'Jewelry Box', price: 15000, maxQty: null },
+    { name: 'Tome of Skull Summoning', price: 20000, maxQty: null },
+    { name: 'Tome of Oom Summoning', price: 20000, maxQty: null },
+    { name: 'Owlbear', price: 5000, maxQty: null },
+    { name: 'Phantasmal Hand', price: 10000, maxQty: null },
+    { name: 'Mutant Hound', price: 10000, maxQty: null },
+    { name: 'Addled Minotaur', price: 10000, maxQty: null },
+    { name: 'Celestial Snake', price: 20000, maxQty: null },
+    { name: 'Living Puppet', price: 30000, maxQty: null },
+    { name: 'Baby Skull', price: 30000, maxQty: null },
+    { name: 'Botched Servant', price: 30000, maxQty: null },
+    { name: 'Strange Shadow', price: 30000, maxQty: null },
+    { name: 'Gelatinous Cube', price: 30000, maxQty: null },
+  ] ;
+  // ───────────────────────────────────────────────────────────────────────────
+
+  let lines = [];
+
+  function freshLine() { return { itemIndex: 0, qty: 1 }; }
+
+  function resetAll() {
+    lines = [];
+    renderLines();
+  }
+
+  function addLine() {
+    lines.push(freshLine());
+    renderLines();
+  }
+
+  function removeLine(i) {
+    lines.splice(i, 1);
+    renderLines();
+  }
+
+  function buildOptions(selected) {
+    return catalogItems.map((item, i) =>
+      `<option value="${i}"${i === selected ? ' selected' : ''}>${item.name}</option>`
+    ).join('');
+  }
+
+  function updateQty(i, el) {
+    const it = catalogItems[lines[i].itemIndex];
+    const m = (it && it.maxQty != null) ? it.maxQty : null;
+    let v = parseInt(el.value) || 0;
+    if (m !== null && v > m) { v = m; el.value = v; }
+    lines[i].qty = v;
+    updateTotals();
+  }
+
+  function updateSelect(i, el) {
+    lines[i].itemIndex = parseInt(el.value);
+    const it = catalogItems[lines[i].itemIndex];
+    const m = (it && it.maxQty != null) ? it.maxQty : null;
+    if (m !== null && lines[i].qty > m) lines[i].qty = m;
+    const disp = document.getElementById("display-" + i);
+    if (disp) disp.textContent = it ? it.name : '';
+    renderLines();
+  }
+
+  function renderLines() {
+    const list = document.getElementById('lines-list');
+    list.innerHTML = lines.map((line, i) => {
+      const item = catalogItems[line.itemIndex];
+      const qty = parseInt(line.qty) || 0;
+      const total = item ? (item.price * qty).toFixed(2) : '0.00';
+      const itemMax = item && item.maxQty != null ? item.maxQty : null;
+
+      return `<div class="line-row" role="listitem">
+        <div class="cell">
+          <div class="custom-select">
+            <div class="custom-select-display" id="display-${i}">${item ? item.name : ''}</div>
+            <select aria-label="Item ${i + 1}" onchange="updateSelect(${i}, this)">${buildOptions(line.itemIndex)}</select>
+          </div>
+          <span class="hint"></span>
+        </div>
+        <div class="cell">
+          <input type="number" min="0" step="1" value="${qty}"
+            aria-label="Quantity for line ${i + 1}"
+            oninput="updateQty(${i}, this)" />
+          <span class="hint qty-limit${itemMax !== null ? (qty > itemMax ? ' over' : '') : ''}">${itemMax !== null ? 'max ' + itemMax : ''}</span>
+        </div>
+        <div class="cell" style="align-items:flex-end">
+          <span class="row-total" aria-label="Line total">${total}</span>
+          <span class="hint"></span>
+        </div>
+        <div class="cell" style="align-items:center">
+          <button class="del-btn" onclick="removeLine(${i})" aria-label="Remove line ${i + 1}">
+            <i class="ti ti-x" aria-hidden="true" style="font-size:15px"></i>
+          </button>
+          <span class="hint"></span>
+        </div>
+      </div>`;
+    }).join('');
+
+    updateTotals();
+  }
+
+  function updateTotals() {
+    let grand = 0;
+    const resultLines = [];
+
+    lines.forEach((line, i) => {
+      const item = catalogItems[line.itemIndex];
+      const qty = parseInt(line.qty) || 0;
+      const lineTotal = item ? item.price * qty : 0;
+      grand += lineTotal;
+      const span = document.querySelectorAll('.row-total')[i];
+      if (span) span.textContent = lineTotal.toFixed(2);
+      const limitEl = document.querySelectorAll('.qty-limit')[i];
+      if (limitEl && item && item.maxQty != null) {
+        limitEl.classList.toggle('over', qty > item.maxQty);
+      }
+      if (item && qty > 0) {
+        resultLines.push(`${item.name} x${qty} = ${lineTotal.toFixed(2)}`);
+      }
+    });
+
+    document.getElementById('grand-total').textContent = grand.toFixed(2);
+
+    const outputBox = document.getElementById('output-box');
+    if (resultLines.length) {
+      outputBox.value = '## Total: ' + grand.toFixed(2) + '\n-# ' + resultLines.join(', ');
+    } else {
+      outputBox.value = '';
+    }
+  }
+
+  function copyResult() {
+    const box = document.getElementById('output-box');
+    if (!box.value) return;
+    navigator.clipboard.writeText(box.value).then(() => {
+      const btn = document.getElementById('copy-btn');
+      btn.classList.add('copied');
+      btn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> Copied';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '<i class="ti ti-copy" aria-hidden="true"></i> Copy';
+      }, 2000);
+    });
+  }
+
+  resetAll();
+</script>
+</body>
+</html>
