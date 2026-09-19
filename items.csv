@@ -2,14 +2,14 @@ Coin, 1, ,
 Super Modifier Potion, 15000, , Hit List
 Super Marking Potion, 15000, , Hit List
 Variant Potion, 15000, , Hit List
-Anomalous Wand, 15000, , Hit List
+Mithril Wand, 20000, , Hit List
+Ingot Wand, 25000, , Hit List
 Rainbow Slime, 30000, , Hit List
-Prism Wand, 30000, , Hit List
-Starfield Wand, 30000, , Hit List
 Wizards Pendant, 40000, , Hit List
 High Gemstone, 40000, , Hit List
 Fay Gemstone, 40000, , Hit List
 Harvesters Pitchfork, 40000, , Hit List
+Crystal Broadsword, 40000, , Hit List
 Sooty Band, 1000, 10, Common Transformation
 Dun Band, 1000, 10, Common Transformation
 Pangare Band, 1000, 10, Common Transformation
@@ -26,13 +26,16 @@ Fragmented Geode, 5000, 10, Uncommon Transformation
 Glittering Swarf, 5000, 10, Uncommon Transformation
 Sepulchered Wand, 5000, 10, Uncommon Transformation
 Collar Charm, 5000, 10, Uncommon Transformation
+Damascus Band, 5000, 10, Uncommon Transformation
 Girdle Charm, 5000, 10, Uncommon Transformation
+Basic Pendant, 10000, 10, Rare Transformation
 False Leopard Charm, 10000, 10, Rare Transformation
 Tapestry Wand, 10000, 10, Rare Transformation
 Tabard Wand, 10000, 10, Rare Transformation
 Gilt Wand, 10000, 10, Rare Transformation
 Blanched Charm, 10000, 10, Rare Transformation
 Furled Pennant, 10000, 10, Rare Transformation
+Pitch Band, 10000, 10, Rare Transformation
 Signet Ring, 10000, 10, Rare Transformation
 Vellum Wand, 10000, 10, Rare Transformation
 Glowing Lantern, 10000, 10, Rare Transformation
@@ -44,6 +47,8 @@ Lacquer Wand, 15000, 10, Epic Transformation
 Filigree Charm, 20000, 10, Legendary Transformation
 Ossuary Charm, 20000, 10, Legendary Transformation
 Vault Key, 1000, , Misc
+Humming Crystal, 1000, , Misc
+Ingot (Any), 2500, , Misc
 Scroll Pack, 5000, , Misc
 Jewelry Box, 15000, , Misc
 Tome of Skull Summoning, 20000, , Misc
@@ -51,8 +56,6 @@ Tome of Oom Summoning, 20000, , Misc
 Owlbear, 5000, , Unbonded Pets
 Phantasmal Hand, 10000, , Unbonded Pets
 Mutant Hound, 10000, , Unbonded Pets
-Addled Minotaur, 10000, , Unbonded Pets
-Celestial Snake, 20000, , Unbonded Pets
 Living Puppet, 30000, , Unbonded Pets
 Baby Skull, 30000, , Unbonded Pets
 Botched Servant, 30000, , Unbonded Pets
